@@ -1,0 +1,263 @@
+<html>
+	<head>
+		<title>3D Repo viewer</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="./main.css">
+	</head>
+	<body>
+        <script type="module">
+
+			import * as THREE from './three.module.js';
+
+			//import Stats from './stats.module.js';
+
+			var camera, scene, renderer, stats, starsGroup, forksGroup, openIssuesGroup, contributorsGroup;
+
+			var mouseX = 0, mouseY = 0;
+
+			var windowHalfX = window.innerWidth / 2;
+			var windowHalfY = window.innerHeight / 2;
+
+			//repo data
+			var ghStars="<%=starsCount%>";
+			var ghForks="<%=forksCount%>";
+			var openIssues ="<%=openIssuesCount%>";
+			var contributors ="<%=subscribersCount%>";
+
+			init();
+			animate();
+
+			function init() {
+
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera.position.z = 2000;
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xffffff );
+				scene.fog = new THREE.Fog( 0xffffff, 1, 10000 );
+
+				//lights on
+				var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.25 );
+				scene.add( directionalLight );
+
+				var geometry = new THREE.BoxBufferGeometry( 100, 100, 100 );
+				
+				var starsMaterial = new THREE.MeshPhongMaterial({
+					//color: 0x00b8ff,
+					emissive: 0x00b8ff,
+					shininess: 90,
+					specular: 0xffffff,
+					side: THREE.DoubleSide,
+					transparent: true,
+					opacity: .8
+				});
+				
+				var forksMaterial = new THREE.MeshBasicMaterial({
+					color: 0xFFCF40,
+					side: THREE.DoubleSide,
+					transparent: true,
+					opacity: .4
+				});
+
+				var openIssuesMaterial = new THREE.MeshBasicMaterial({
+					color: 0xFA4D57,
+					side: THREE.DoubleSide,
+					transparent: true,
+					opacity: .4
+				});
+
+				var contributorsMaterial= new THREE.MeshBasicMaterial({
+					color: 0x3B7548,
+					side: THREE.DoubleSide,
+					transparent: true,
+					opacity: .4
+				});
+
+				//create GitHub Stars group
+				starsGroup = new THREE.Group();
+
+				for ( var i = 0; i < ghStars; i ++ ) {
+
+					var ghStarsMesh = new THREE.Mesh( geometry, starsMaterial );
+					ghStarsMesh.position.x = Math.random() * 2000 - 1000;
+					ghStarsMesh.position.y = Math.random() * 2000 - 1000;
+					ghStarsMesh.position.z = Math.random() * 2000 - 1000;
+
+					ghStarsMesh.rotation.x = Math.random() * 2 * Math.PI;
+					ghStarsMesh.rotation.y = Math.random() * 2 * Math.PI;
+
+					ghStarsMesh.matrixAutoUpdate = false;
+					ghStarsMesh.updateMatrix();
+
+					starsGroup.add( ghStarsMesh );
+
+				}
+
+				scene.add( starsGroup );
+
+				//
+
+				//create GitHub forks group
+				forksGroup = new THREE.Group();
+
+				for ( var i = 0; i < ghForks; i ++ ) {
+
+					var ghForksMesh = new THREE.Mesh( geometry, forksMaterial );
+					ghForksMesh.position.x = Math.random() * 2000 - 1000;
+					ghForksMesh.position.y = Math.random() * 2000 - 1000;
+					ghForksMesh.position.z = Math.random() * 2000 - 1000;
+
+					ghForksMesh.rotation.x = Math.random() * 2 * Math.PI;
+					ghForksMesh.rotation.y = Math.random() * 2 * Math.PI;
+
+					ghForksMesh.matrixAutoUpdate = false;
+					ghForksMesh.updateMatrix();
+
+					forksGroup.add( ghForksMesh );
+
+				}
+
+				scene.add( forksGroup );
+
+				//
+
+				//create open issues group
+				openIssuesGroup = new THREE.Group();
+
+				for ( var i = 0; i < openIssues; i ++ ) {
+
+					var openIssuesMesh = new THREE.Mesh( geometry, openIssuesMaterial );
+					openIssuesMesh.position.x = Math.random() * 2000 - 1000;
+					openIssuesMesh.position.y = Math.random() * 2000 - 1000;
+					openIssuesMesh.position.z = Math.random() * 2000 - 1000;
+
+					openIssuesMesh.rotation.x = Math.random() * 2 * Math.PI;
+					openIssuesMesh.rotation.y = Math.random() * 2 * Math.PI;
+
+					openIssuesMesh.matrixAutoUpdate = false;
+					openIssuesMesh.updateMatrix();
+
+					openIssuesGroup.add( openIssuesMesh );
+
+				}
+
+				scene.add( openIssuesGroup );
+
+				//
+
+				//create contributors group
+				contributorsGroup = new THREE.Group();
+
+				for ( var i = 0; i < openIssues; i ++ ) {
+
+					var contributorsMesh = new THREE.Mesh( geometry, contributorsMaterial );
+					contributorsMesh.position.x = Math.random() * 2000 - 1000;
+					contributorsMesh.position.y = Math.random() * 2000 - 1000;
+					contributorsMesh.position.z = Math.random() * 2000 - 1000;
+
+					contributorsMesh.rotation.x = Math.random() * 2 * Math.PI;
+					contributorsMesh.rotation.y = Math.random() * 2 * Math.PI;
+
+					contributorsMesh.matrixAutoUpdate = false;
+					contributorsMesh.updateMatrix();
+
+					contributorsGroup.add( contributorsMesh );
+
+				}
+
+				scene.add( contributorsGroup );
+				//
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
+
+				//
+
+				//stats = new Stats();
+				//document.body.appendChild( stats.dom );
+
+				//
+
+				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function onDocumentMouseMove( event ) {
+
+				mouseX = ( event.clientX - windowHalfX ) * 10;
+				mouseY = ( event.clientY - windowHalfY ) * 10;
+
+			}
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+			//	stats.update();
+
+			}
+
+			function render() {
+
+				var time = Date.now() * 0.001;
+
+				var rx = Math.sin( time * 0.7 ) * 0.5,
+					ry = Math.sin( time * 0.3 ) * 0.5,
+					rz = Math.sin( time * 0.2 ) * 0.5;
+
+				camera.position.x += ( mouseX - camera.position.x ) * 0.15;
+				camera.position.y += ( - mouseY - camera.position.y ) * 0.15;
+
+				camera.lookAt( scene.position );
+
+				starsGroup.rotation.x = rx;
+				starsGroup.rotation.y = ry;
+				starsGroup.rotation.z = rz;
+
+				forksGroup.rotation.x = rx*0.5;
+				forksGroup.rotation.y = ry*0.5;
+				forksGroup.rotation.z = rz*0.5;
+
+				openIssuesGroup.rotation.x = rx*0.25;
+				openIssuesGroup.rotation.y = ry*0.25;
+				openIssuesGroup.rotation.z = rz*0.25;
+
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+		<div class="title">
+             <%=repoName%>
+		</div>
+		<div class="legend">
+			<span class="starsDot"></span> <%=starsCount%> stars
+            <span class="forksDot"></span> <%=forksCount%> Forks
+			<span class="openIssuesDot"></span> <%=openIssuesCount%> Open Issues
+			<span class="contributorsDot"></span> <%=subscribersCount%> Subscribers
+		</div>
+    </body>
+</html>
